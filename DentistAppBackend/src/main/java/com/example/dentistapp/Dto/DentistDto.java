@@ -26,6 +26,24 @@ public class DentistDto {
     private String password;
     @NotNull
     private int roleId;
+    private String specialization;
+    private String location;
+
+    public String getSpecialization() {
+        return specialization;
+    }
+
+    public void setSpecialization(String specialization) {
+        this.specialization = specialization;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
 
     public int getRoleId() {
         return roleId;

@@ -63,6 +63,8 @@ public class Converter {
         dentist.setPassword(dentistDto.getPassword());
         dentist.setSSID(dentistDto.getSSID());
         dentist.setPhoneNumber(dentistDto.getPhoneNumber());
+        dentist.setSpecialization(dentistDto.getSpecialization());
+        dentist.setLocation(dentistDto.getLocation());
 
         Role role = roleRepository.findById(dentistDto.getRoleId())
                 .orElseThrow(() -> new RuntimeException("Role not found"));
@@ -81,6 +83,8 @@ public class Converter {
         dentistDto.setSSID(dentist.getSSID());
         dentistDto.setPassword(dentist.getPassword());
         dentistDto.setRoleId(dentist.getRole().getId());
+        dentistDto.setSpecialization(dentist.getSpecialization());
+        dentistDto.setLocation(dentist.getLocation());
 
         return dentistDto;
 
@@ -103,6 +107,7 @@ public class Converter {
         treatmentDto.setTreatmentDescription(treatment.getTreatmentDescription());
         treatmentDto.setTreatmentDate(treatment.getTreatmentDate());
         treatmentDto.setTreatmentStatus(treatment.getTreatmentStatus());
+        treatmentDto.setDentistId(treatment.getDentistId());
         return treatmentDto;
     }
 
@@ -113,6 +118,7 @@ public class Converter {
         treatment.setTreatmentDescription(treatmentDto.getTreatmentDescription());
         treatment.setTreatmentDate(treatmentDto.getTreatmentDate());
         treatment.setTreatmentStatus(treatmentDto.getTreatmentStatus());
+        treatment.setDentistId(treatmentDto.getDentistId());
         return treatment;
     }
 

@@ -59,7 +59,7 @@ public class DataLoader implements CommandLineRunner {
         }
 
         // Tedavi verilerini kontrol et ve ekle
-        if (treatmentRepository.count() == 0) {
+       /* if (treatmentRepository.count() == 0) {
             Treatment treatment1 = new Treatment();
             treatment1.setTreatmentName("Root Canal Treatment");
             treatment1.setTreatmentDescription("A procedure to save a severely decayed or infected tooth.");
@@ -81,6 +81,6 @@ public class DataLoader implements CommandLineRunner {
             treatmentRepository.save(treatment1);
             treatmentRepository.save(treatment2);
             treatmentRepository.save(treatment3);
-        }
+        }*/
     }
 }

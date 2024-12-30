@@ -21,6 +21,13 @@ public class DentistService {
         this.converter = converter;
     }
 
+    public List<DentistDto> searchDentists(String specialization, String location) {
+        List<Dentist> dentists= dentistRepository.findBySpecializationAndLocation(specialization, location);
+        return dentists.stream()
+                .map(converter::dentistConvertToDto)
+                .collect(Collectors.toList());
+    }
+
     public List<DentistDto> getAllDentist(){
         List<Dentist> dentists = dentistRepository.findAll();
         return dentists.stream()

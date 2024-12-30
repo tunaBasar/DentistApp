@@ -14,6 +14,16 @@ public class TreatmentDto {
     private LocalDate treatmentDate;
     private TreatmentStatus treatmentStatus;
 
+    public UUID getDentistId() {
+        return dentistId;
+    }
+
+    public void setDentistId(UUID dentistId) {
+        this.dentistId = dentistId;
+    }
+
+    private UUID dentistId;
+
     public TreatmentStatus getTreatmentStatus() {
         return treatmentStatus;
     }

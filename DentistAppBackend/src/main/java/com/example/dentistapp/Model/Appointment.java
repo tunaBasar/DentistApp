@@ -14,6 +14,41 @@ import java.util.UUID;
 @Setter
 public class Appointment {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(unique = true, nullable = false)
+    private UUID id;
+    private LocalDateTime appointmentDateTime;
+    @ManyToOne
+    @JoinColumn(name = "dentist_id")
+    private Dentist dentist;
+    @ManyToOne
+    @JoinColumn(name = "patient_id")
+    private Patient patient;
+
+    @ManyToOne
+    @JoinColumn(name = "treatmetn_id")
+    private Treatment treatment;
+    private boolean isAvailable;
+    @Enumerated(EnumType.STRING)
+    private AppointmentStatus status = AppointmentStatus.PENDING;  // Default olarak PENDING
+
+    public Treatment getTreatment() {
+        return treatment;
+    }
+
+    public void setTreatment(Treatment treatment) {
+        this.treatment = treatment;
+    }
+
+    public boolean isAvailable() {
+        return isAvailable;
+    }
+
+    public void setAvailable(boolean available) {
+        isAvailable = available;
+    }
+
     public UUID getId() {
         return id;
     }
@@ -53,24 +88,6 @@ public class Appointment {
     public void setStatus(AppointmentStatus status) {
         this.status = status;
     }
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(unique = true, nullable = false)
-    private UUID id;
-
-    private LocalDateTime appointmentDateTime;
-
-    @ManyToOne
-    @JoinColumn(name = "dentist_id")
-    private Dentist dentist;
-
-    @ManyToOne
-    @JoinColumn(name = "patient_id")
-    private Patient patient;
-
-    @Enumerated(EnumType.STRING)
-    private AppointmentStatus status = AppointmentStatus.PENDING;  // Default olarak PENDING
 
 }
 

@@ -1,6 +1,7 @@
 package com.example.dentistapp.Controller;
 
 import com.example.dentistapp.Dto.AppointmentDto;
+import com.example.dentistapp.Request.AppointmentRequest;
 import com.example.dentistapp.Service.AppointmentService;
 import com.example.dentistapp.Exception.ResourceNotFoundException;
 import org.springframework.http.ResponseEntity;
@@ -24,8 +25,8 @@ public class AppointmentController {
     }
 
     @PostMapping()
-    public ResponseEntity<AppointmentDto> createAppointment(@RequestBody AppointmentDto appointmentDto) {
-        return new ResponseEntity<>(appointmentService.createAppointment(appointmentDto), CREATED);
+    public ResponseEntity<AppointmentRequest> createAppointment(@RequestBody AppointmentRequest appointmentRequest) {
+        return new ResponseEntity<>(appointmentService.bookAppointment(appointmentRequest), CREATED);
     }
 
     @GetMapping("/dentist/{id}")

@@ -27,6 +27,13 @@ public class TreatmentService {
                 .collect(Collectors.toList());
     }
 
+    public List<TreatmentDto> filterTreatmentsByDentist(UUID dentistId, String treatmentName) {
+        List<Treatment> treatments=treatmentRepository.findByDentistIdAndTreatmentNameContaining(dentistId, treatmentName);
+        return treatments.stream()
+                .map(converter::treatmentConvertToDto)
+                .collect(Collectors.toList());
+    }
+
     public TreatmentDto getTreatmentById(UUID id) {
         return converter.treatmentConvertToDto(treatmentRepository.findById(id).orElseThrow(
                 () -> new RuntimeException("Treatment not found")));

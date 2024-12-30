@@ -16,8 +16,20 @@ public class Treatment {
     private String treatmentName;
     private String treatmentDescription;
     private LocalDate treatmentDate;
+
+    @JoinColumn(name = "dentist_id")
+    private UUID dentistId;
+
     @Enumerated(EnumType.STRING)
     private TreatmentStatus treatmentStatus = TreatmentStatus.NOTHING;
+
+    public UUID getDentistId() {
+        return dentistId;
+    }
+
+    public void setDentistId(UUID dentistId) {
+        this.dentistId = dentistId;
+    }
 
     public TreatmentStatus getTreatmentStatus() {
         return treatmentStatus;
