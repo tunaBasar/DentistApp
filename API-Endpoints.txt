@@ -1,0 +1,201 @@
+# DentistApp API Documentation
+
+## Overview
+This document describes the API endpoints for the DentistApp backend. It includes endpoints for managing patients, dentists, treatments, appointments, recipes, and user authentication.
+
+---
+
+## Endpoints
+
+### AdminController
+Base URL: `/api/admin`
+
+#### Patients
+- **GET** `/patients`
+  - Retrieves all patients.
+  - Response: `200 OK`, List of `PatientDto`.
+
+- **GET** `/patients/{id}`
+  - Retrieves a specific patient by ID.
+  - Path Parameter: `id` (UUID)
+  - Response: `200 OK`, `PatientDto`.
+
+- **POST** `/patients`
+  - Creates a new patient.
+  - Request Body: `PatientDto`
+  - Response: `200 OK`, Created `PatientDto`.
+
+- **PUT** `/patients/{id}`
+  - Updates an existing patient by ID.
+  - Path Parameter: `id` (UUID)
+  - Request Body: `PatientDto`
+  - Response: `200 OK`, Updated `PatientDto`.
+
+- **DELETE** `/patients/{id}`
+  - Deletes a patient by ID.
+  - Path Parameter: `id` (UUID)
+  - Response: `204 No Content`.
+
+#### Dentists
+- Similar endpoints exist for dentists using the base path `/dentists`. Replace `PatientDto` with `DentistDto` and UUID parameter accordingly.
+
+#### Treatments
+- **GET** `/treatments`
+  - Retrieves all treatments.
+  - Response: `200 OK`, List of `TreatmentDto`.
+
+- **GET** `/treatments/{id}`
+  - Retrieves a treatment by ID.
+  - Path Parameter: `id` (Long)
+  - Response: `200 OK`, `TreatmentDto`.
+
+- **POST** `/treatments`
+  - Creates a new treatment.
+  - Request Body: `TreatmentDto`
+  - Response: `200 OK`, Created `TreatmentDto`.
+
+- **PUT** `/treatments/{id}`
+  - Updates an existing treatment by ID.
+  - Path Parameter: `id` (Long)
+  - Request Body: `TreatmentDto`
+  - Response: `200 OK`, Updated `TreatmentDto`.
+
+#### Recipes
+- **GET** `/recipes`
+  - Retrieves all recipes.
+  - Response: `200 OK`, List of `RecipeDto`.
+
+- **GET** `/recipes/{id}`
+  - Retrieves a recipe by ID.
+  - Path Parameter: `id` (Long)
+  - Response: `200 OK`, `RecipeDto`.
+
+- **POST** `/recipes/{patientId}`
+  - Creates a new recipe for a specific patient.
+  - Path Parameter: `patientId` (UUID)
+  - Request Body: `RecipeDto`
+  - Response: `200 OK`, Created `RecipeDto`.
+
+- **DELETE** `/recipes/{id}`
+  - Deletes a recipe by ID.
+  - Path Parameter: `id` (Long)
+  - Response: `204 No Content`.
+
+#### Appointments
+- **GET** `/appointments`
+  - Retrieves all appointments.
+  - Response: `200 OK`, List of `AppointmentDto`.
+
+- **GET** `/appointments/{id}`
+  - Retrieves an appointment by ID.
+  - Path Parameter: `id` (Long)
+  - Response: `200 OK`, `AppointmentDto`.
+
+- **POST** `/appointments`
+  - Creates a new appointment.
+  - Request Body: `AppointmentDto`
+  - Response: `200 OK`, Created `AppointmentDto`.
+
+- **PUT** `/appointments/{id}`
+  - Updates an appointment by ID.
+  - Path Parameter: `id` (Long)
+  - Request Body: `AppointmentDto`
+  - Response: `200 OK`, Updated `AppointmentDto`.
+
+- **DELETE** `/appointments/{id}`
+  - Deletes an appointment by ID.
+  - Path Parameter: `id` (Long)
+  - Response: `204 No Content`.
+
+---
+
+### AppointmentController
+Base URL: `/api/appointments`
+
+Additional Endpoints:
+
+- **GET** `/dentist/{dentistId}`
+  - Retrieves all appointments for a specific dentist.
+  - Path Parameter: `dentistId` (UUID)
+  - Response: `200 OK`, List of `AppointmentDto`.
+
+- **GET** `/patient/{patientId}`
+  - Retrieves all appointments for a specific patient.
+  - Path Parameter: `patientId` (UUID)
+  - Response: `200 OK`, List of `AppointmentDto`.
+
+- **POST** `/{id}/assign-patient/{patientId}`
+  - Assigns a patient to an existing appointment.
+  - Path Parameters: `id` (Long), `patientId` (UUID)
+  - Response: `200 OK`, Updated `AppointmentDto`.
+
+---
+
+### DentistController
+Base URL: `/api/dentists`
+
+Endpoints:
+
+- **POST** `/login`
+  - Authenticates a dentist.
+  - Request Body: `LoginRequest`
+  - Response: `200 OK`, Authentication token or status.
+
+Similar CRUD endpoints exist as described above for dentists.
+
+---
+
+### PatientController
+Base URL: `/api/patients`
+
+Endpoints:
+
+- **POST** `/login`
+  - Authenticates a patient.
+  - Request Body: `LoginRequest`
+  - Response: `200 OK`, Authentication token or status.
+
+CRUD endpoints for patients follow the same structure as described in AdminController.
+
+---
+
+### RecipeController
+Base URL: `/api/recipes`
+
+Endpoints include CRUD operations for managing recipes as shown under AdminController.
+
+---
+
+### TreatmentController
+Base URL: `/api/treatments`
+
+Endpoints include CRUD operations for managing treatments as shown under AdminController.
+
+---
+
+## Data Transfer Objects (DTOs)
+### PatientDto
+- Example fields: `id`, `name`, `age`, `address`.
+
+### DentistDto
+- Example fields: `id`, `name`, `specialization`.
+
+### AppointmentDto
+- Example fields: `id`, `date`, `time`, `patientId`, `dentistId`.
+
+### TreatmentDto
+- Example fields: `id`, `type`, `description`.
+
+### RecipeDto
+- Example fields: `id`, `medication`, `dosage`, `patientId`.
+
+### LoginRequest
+- Example fields: `username`, `password`.
+
+---
+
+## Notes
+1. Ensure all UUID and Long IDs are properly validated in requests.
+2. Authentication endpoints may require token-based authorization.
+3. Error handling and response codes (e.g., `400 Bad Request`, `404 Not Found`) should be implemented.
+
