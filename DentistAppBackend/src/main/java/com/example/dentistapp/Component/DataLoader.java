@@ -2,27 +2,20 @@ package com.example.dentistapp.Component;
 
 import com.example.dentistapp.Model.Admin;
 import com.example.dentistapp.Model.Role;
-import com.example.dentistapp.Model.Treatment;
-import com.example.dentistapp.Enum.TreatmentStatus;
 import com.example.dentistapp.Repository.AdminRepository;
 import com.example.dentistapp.Repository.RoleRepository;
-import com.example.dentistapp.Repository.TreatmentRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
-
-import java.time.LocalDate;
 
 @Component
 public class DataLoader implements CommandLineRunner {
 
     private final RoleRepository roleRepository;
     private final AdminRepository adminRepository;
-    private final TreatmentRepository treatmentRepository;
 
-    public DataLoader(RoleRepository roleRepository, AdminRepository adminRepository, TreatmentRepository treatmentRepository) {
+    public DataLoader(RoleRepository roleRepository, AdminRepository adminRepository) {
         this.roleRepository = roleRepository;
         this.adminRepository = adminRepository;
-        this.treatmentRepository = treatmentRepository;
     }
 
     @Override

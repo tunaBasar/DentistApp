@@ -1,16 +1,12 @@
 package com.example.dentistapp.Service;
 
-import com.example.dentistapp.Converter.Converter;
+import com.example.dentistapp.Converter.AppointmentConverter;
+import com.example.dentistapp.Converter.PatientConverter;
 import com.example.dentistapp.Dto.AppointmentDto;
-import com.example.dentistapp.Dto.FilterCriteria;
-import com.example.dentistapp.Enum.AppointmentStatus;
 import com.example.dentistapp.Exception.ResourceNotFoundException;
 import com.example.dentistapp.Model.Appointment;
-import com.example.dentistapp.Model.Dentist;
 import com.example.dentistapp.Model.Patient;
-import com.example.dentistapp.Model.Treatment;
 import com.example.dentistapp.Repository.AppointmentRepository;
-import com.example.dentistapp.Request.AppointmentRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,81 +17,78 @@ import java.util.stream.Collectors;
 public class AppointmentService {
 
     private final AppointmentRepository appointmentRepository;
-    private final DentistService dentistService;
+    private final AppointmentConverter appointmentConverter;
     private final PatientService patientService;
-    private final Converter converter;
-    private final TreatmentService treatmentService;
+    private final PatientConverter patientConverter;
 
-    public AppointmentService(AppointmentRepository appointmentRepository,
-                              DentistService dentistService,
-                              PatientService patientService,
-                              Converter converter, TreatmentService treatmentService) {
+    public AppointmentService(AppointmentRepository appointmentRepository, AppointmentConverter appointmentConverter, PatientService patientService, PatientConverter patientConverter){
         this.appointmentRepository = appointmentRepository;
-        this.dentistService = dentistService;
+        this.appointmentConverter = appointmentConverter;
         this.patientService = patientService;
-        this.converter = converter;
-        this.treatmentService = treatmentService;
+        this.patientConverter = patientConverter;
     }
 
-    public AppointmentRequest bookAppointment(AppointmentRequest request) {
-        Appointment appointment = new Appointment();
-        Dentist dentist= converter.dentistConvertFromDto(dentistService.getDentistById(request.getDentistId()));
-        Patient patient= converter.patientConvertFromDto(patientService.getPatientById(request.getPatientId()));
-        Treatment treatment= converter.treatmentConvertFromDto(treatmentService.getTreatmentById(request.getTreatmentId()));
-        if (dentist != null) {
-            appointment.setDentist(dentist);
-        }
-        else {
-            throw new ResourceNotFoundException("Dentist not found"+request.getDentistId());
-        }
-        if (patient != null) {
-            appointment.setPatient(patient);
-        }
-        else {
-            throw new ResourceNotFoundException("Patient not found"+request.getPatientId());
-        }
-        if (treatment != null) {
-            appointment.setTreatment(treatment);
-        }
-        else {
-            throw new ResourceNotFoundException("Treatment not found"+request.getTreatmentId());
-        }
-        appointment.setAppointmentDateTime(request.getDateTime());
-        appointmentRepository.save(appointment);
-        return request;
+    public List<AppointmentDto> getAllAppointments(){
+        List<Appointment> appointments = appointmentRepository.findAll();
+        return appointments.stream()
+                .map(appointmentConverter::toDto)
+                .collect(Collectors.toList());
     }
 
+    public AppointmentDto getAppointmentById(Long id){
+        Appointment appointment = appointmentRepository.findById(id).orElseThrow(
+                () -> new RuntimeException("No appointment found with id: " + id));
 
-    public List<AppointmentDto>getAppointmentByPatientId(UUID id){
-        List<Appointment> appointments = appointmentRepository.getAppointmentsByPatientId(id);
-        return appointments.stream().
-                map(converter::appointmentConvertToDto).
-                collect(Collectors.toList());
-   }
-    public AppointmentDto addAvailability(UUID dentistId, Appointment appointment) {
-        appointment.setDentist(converter.dentistConvertFromDto(dentistService.getDentistById(dentistId)));
-        appointment.setAvailable(true);
-        return converter.appointmentConvertToDto(appointmentRepository.save(appointment));
-    }
-    public List<AppointmentDto>getAppointmentByDentistId(UUID id){
-        List<Appointment> appointments = appointmentRepository.getAppointmentsByDentistId(id);
-        return appointments.stream().
-                map(converter::appointmentConvertToDto).
-                collect(Collectors.toList());
-    }
-    public AppointmentDto updateAppointmentStatus(UUID appointmentId, AppointmentStatus status) {
-        Appointment appointment = appointmentRepository.findById(appointmentId).orElseThrow(() -> new RuntimeException("Appointment not found"));
-        appointment.setStatus(status);
-        return converter.appointmentConvertToDto(appointmentRepository.save(appointment));
+        return appointmentConverter.toDto(appointment);
+
     }
 
-    public void deleteAppointmentById(UUID id){
+    public AppointmentDto createAppointment(AppointmentDto appointmentDto){
+        Appointment appointment=appointmentRepository
+                .save(appointmentConverter.toEntity(appointmentDto));
+        return appointmentConverter.toDto(appointment);
+    }
+
+    public AppointmentDto updateAppointment(Long id, AppointmentDto appointmentDto){
+       Appointment oldAppointment= appointmentConverter.toEntity(getAppointmentById(id));
+
+        oldAppointment.setAvailable(appointmentDto.isAvailable());
+        oldAppointment.setAppointmentDateTime(appointmentDto.getAppointmentDateTime());
+        oldAppointment.setDentist(appointmentDto.getDentist());
+        oldAppointment.setPatient(appointmentDto.getPatient());
+        appointmentRepository.save(oldAppointment);
+
+        return appointmentConverter.toDto(oldAppointment);
+    }
+
+    public void deleteAppointmentById(Long id){
         appointmentRepository.deleteById(id);
     }
 
-    public List<AppointmentDto> getAppointment() {
-        return appointmentRepository.findAll().stream()
-                .map(converter::appointmentConvertToDto)
+    public List<AppointmentDto> getAllAppointmentsByDentistId(UUID dentistId){
+        List<Appointment> appointments=appointmentRepository.getAppointmentsByDentistId(dentistId);
+        return appointments.stream()
+                .map(appointmentConverter::toDto)
                 .collect(Collectors.toList());
     }
+    public List<AppointmentDto> getAllAppointmentsByPatientId(UUID patientId){
+        List<Appointment> appointments=appointmentRepository.getAppointmentsByPatientId(patientId);
+        return appointments.stream()
+                .map(appointmentConverter::toDto)
+                .collect(Collectors.toList());
+    }
+
+    public AppointmentDto savePatientToAppointment(Long id,UUID patientId){
+        Appointment appointment=appointmentRepository.findById(id).orElseThrow
+                (() -> new ResourceNotFoundException("No appointment found with id: " + id));
+        Patient newpatient=patientConverter.toEntity(patientService.getPatientById(patientId));
+
+        if (!appointment.isAvailable()){
+            throw new IllegalStateException("The appointment is not available.");
+        }
+        appointment.setPatient(newpatient);
+        appointment.setAvailable(false);
+        return appointmentConverter.toDto(appointmentRepository.save(appointment));
+    }
+
 }

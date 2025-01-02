@@ -13,7 +13,7 @@ import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 
 @RestController
-@RequestMapping("/patient")
+@RequestMapping("/api/patients")
 public class PatientController {
 
     private final PatientService patientService;

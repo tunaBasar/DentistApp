@@ -2,24 +2,39 @@ package com.example.dentistapp.Model;
 
 import jakarta.persistence.*;
 
-import java.util.UUID;
+import java.time.LocalDateTime;
 
 @Entity
 public class Recipe {
-    public UUID getId() {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private LocalDateTime date;
+    @ManyToOne
+    @JoinColumn(name = "patient_id", nullable = false)
+    private Patient patient;
+    @ManyToOne
+    @JoinColumn(name = "dentist_id", nullable = false)
+    private Dentist dentist;
+    @ManyToOne
+    @JoinColumn(name = "treatment_id", nullable = false)
+    private Treatment treatment;
+
+    public Long getId() {
         return id;
     }
 
-    public void setId(UUID id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
-    public Dentist getDentist() {
-        return dentist;
+    public LocalDateTime getDate() {
+        return date;
     }
 
-    public void setDentist(Dentist dentist) {
-        this.dentist = dentist;
+    public void setDate(LocalDateTime date) {
+        this.date = date;
     }
 
     public Patient getPatient() {
@@ -30,6 +45,14 @@ public class Recipe {
         this.patient = patient;
     }
 
+    public Dentist getDentist() {
+        return dentist;
+    }
+
+    public void setDentist(Dentist dentist) {
+        this.dentist = dentist;
+    }
+
     public Treatment getTreatment() {
         return treatment;
     }
@@ -38,30 +61,5 @@ public class Recipe {
         this.treatment = treatment;
     }
 
-    public String getDescription() {
-        return description;
-    }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private UUID id;
-
-
-    @ManyToOne
-    @JoinColumn(name = "dentist_id")
-    private Dentist dentist;
-
-    @ManyToOne
-    @JoinColumn(name = "patient_id")
-    private Patient patient;
-
-    @ManyToOne
-    @JoinColumn(name = "treatment_id")
-    private Treatment treatment;
-
-    private String description;
 }

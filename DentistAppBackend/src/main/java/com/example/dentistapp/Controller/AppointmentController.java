@@ -1,21 +1,15 @@
 package com.example.dentistapp.Controller;
 
 import com.example.dentistapp.Dto.AppointmentDto;
-import com.example.dentistapp.Request.AppointmentRequest;
 import com.example.dentistapp.Service.AppointmentService;
-import com.example.dentistapp.Exception.ResourceNotFoundException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
 
-import static org.springframework.http.HttpStatus.CREATED;
-import static org.springframework.http.HttpStatus.OK;
-import static org.springframework.http.HttpStatus.NOT_FOUND;
-
 @RestController
-@RequestMapping("/appointments")
+@RequestMapping("/api/appointments")
 public class AppointmentController {
 
     private final AppointmentService appointmentService;
@@ -24,37 +18,44 @@ public class AppointmentController {
         this.appointmentService = appointmentService;
     }
 
-    @PostMapping()
-    public ResponseEntity<AppointmentRequest> createAppointment(@RequestBody AppointmentRequest appointmentRequest) {
-        return new ResponseEntity<>(appointmentService.bookAppointment(appointmentRequest), CREATED);
-    }
-
-    @GetMapping("/dentist/{id}")
-    public ResponseEntity<List<AppointmentDto>> getAppointmentByDentistId(@PathVariable UUID id) {
-        List<AppointmentDto> appointments = appointmentService.getAppointmentByDentistId(id);
-        if (appointments.isEmpty()) {
-            throw new ResourceNotFoundException("No appointments found for dentist with id: " + id);
-        }
-        return new ResponseEntity<>(appointments, OK);
-    }
-
-    @GetMapping("/patient/{id}")
-    public ResponseEntity<List<AppointmentDto>> getAppointmentByPatientId(@PathVariable UUID id) {
-        return new ResponseEntity<>(appointmentService.getAppointmentByPatientId(id), OK);
-    }
-
     @GetMapping
     public ResponseEntity<List<AppointmentDto>> getAllAppointments() {
-        return new ResponseEntity<>(appointmentService.getAppointment(), OK);
+        return ResponseEntity.ok(appointmentService.getAllAppointments());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<AppointmentDto> getAppointmentById(@PathVariable Long id) {
+        return ResponseEntity.ok(appointmentService.getAppointmentById(id));
+    }
+
+    @PostMapping
+    public ResponseEntity<AppointmentDto> createAppointment(@RequestBody AppointmentDto appointmentDto) {
+        return ResponseEntity.ok(appointmentService.createAppointment(appointmentDto));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<AppointmentDto> updateAppointment(@PathVariable Long id, @RequestBody AppointmentDto appointmentDto) {
+        return ResponseEntity.ok(appointmentService.updateAppointment(id, appointmentDto));
     }
 
     @DeleteMapping("/{id}")
-    public void deleteAppointment(@PathVariable UUID id) {
+    public ResponseEntity<Void> deleteAppointment(@PathVariable Long id) {
         appointmentService.deleteAppointmentById(id);
+        return ResponseEntity.noContent().build();
     }
 
-    @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<String> handleResourceNotFound(ResourceNotFoundException ex) {
-        return new ResponseEntity<>(ex.getMessage(), NOT_FOUND);
+    @GetMapping("/dentist/{dentistId}")
+    public ResponseEntity<List<AppointmentDto>> getAllAppointmentsByDentistId(@PathVariable UUID dentistId) {
+        return ResponseEntity.ok(appointmentService.getAllAppointmentsByDentistId(dentistId));
+    }
+
+    @GetMapping("/patient/{patientId}")
+    public ResponseEntity<List<AppointmentDto>> getAllAppointmentsByPatientId(@PathVariable UUID patientId) {
+        return ResponseEntity.ok(appointmentService.getAllAppointmentsByPatientId(patientId));
+    }
+
+    @PostMapping("/{id}/assign-patient/{patientId}")
+    public ResponseEntity<AppointmentDto> savePatientToAppointment(@PathVariable Long id, @PathVariable UUID patientId) {
+        return ResponseEntity.ok(appointmentService.savePatientToAppointment(id, patientId));
     }
 }

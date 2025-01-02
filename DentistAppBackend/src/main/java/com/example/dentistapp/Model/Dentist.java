@@ -2,6 +2,7 @@ package com.example.dentistapp.Model;
 
 import jakarta.persistence.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -9,8 +10,11 @@ public class Dentist extends User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(unique = true, nullable = false)
     private UUID id;
+
+    @OneToMany(mappedBy = "dentist", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Appointment> appointments;
+
     private String phoneNumber;
     private String specialization;
     private String location;

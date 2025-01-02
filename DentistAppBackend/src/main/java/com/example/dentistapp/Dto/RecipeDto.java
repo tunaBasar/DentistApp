@@ -1,52 +1,56 @@
 package com.example.dentistapp.Dto;
 
-import java.util.UUID;
+import com.example.dentistapp.Model.Dentist;
+import com.example.dentistapp.Model.Patient;
+import com.example.dentistapp.Model.Treatment;
+
+import java.time.LocalDateTime;
 
 public class RecipeDto {
 
-    private UUID id;
-    private UUID dentistId;
-    private UUID patientId;
-    private UUID treatmentId;
-    private String description;
+    private Long id;
+    private Dentist dentist;
+    private Patient patient;
+    private Treatment treatment;
+    private LocalDateTime date;
 
-    public UUID getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(UUID id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
-    public UUID getDentistId() {
-        return dentistId;
+    public Dentist getDentist() {
+        return dentist;
     }
 
-    public void setDentistId(UUID dentistId) {
-        this.dentistId = dentistId;
+    public void setDentist(Dentist dentist) {
+        this.dentist = dentist;
     }
 
-    public UUID getPatientId() {
-        return patientId;
+    public Patient getPatient() {
+        return patient;
     }
 
-    public void setPatientId(UUID patientId) {
-        this.patientId = patientId;
+    public void setPatient(Patient patient) {
+        this.patient = patient;
     }
 
-    public UUID getTreatmentId() {
-        return treatmentId;
+    public Treatment getTreatment() {
+        return treatment;
     }
 
-    public void setTreatmentId(UUID treatmentId) {
-        this.treatmentId = treatmentId;
+    public void setTreatment(Treatment treatment) {
+        this.treatment = treatment;
     }
 
-    public String getDescription() {
-        return description;
+    public LocalDateTime getDate() {
+        return date;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setDate(LocalDateTime date) {
+        this.date = date;
     }
 }

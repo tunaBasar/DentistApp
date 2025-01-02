@@ -1,7 +1,7 @@
 package com.example.dentistapp.Service;
 
 
-import com.example.dentistapp.Converter.Converter;
+import com.example.dentistapp.Converter.PatientConverter;
 import com.example.dentistapp.Dto.PatientDto;
 import com.example.dentistapp.Model.Patient;
 import com.example.dentistapp.Repository.PatientRepository;
@@ -18,18 +18,18 @@ import java.util.stream.Collectors;
 @Service
 public class PatientService {
 
-    private final Converter converter;
+    private final PatientConverter patientConverter;
     private final PatientRepository patientRepository;
 
-    public PatientService(PatientRepository patientRepository, Converter converter) {
+    public PatientService(PatientRepository patientRepository,PatientConverter patientConverter) {
         this.patientRepository = patientRepository;
-        this.converter = converter;
+        this.patientConverter = patientConverter;
     }
 
     public List<PatientDto> getAllPatients() {
         List<Patient> patients = patientRepository.findAll();
         return patients.stream()
-                .map(converter::patientConvertToDto)
+                .map(patientConverter::toDto)
                 .collect(Collectors.toList());
     }
 
@@ -37,11 +37,11 @@ public class PatientService {
         Patient patient = patientRepository.findById(id).orElseThrow(
                 () -> new RuntimeException("Patient not found"));
 
-        return converter.patientConvertToDto(patient);
+        return patientConverter.toDto(patient);
     }
 
     public PatientDto updatePatient(UUID id, PatientDto patientDto) {
-        Patient oldpatient= converter.patientConvertFromDto(getPatientById(id));
+        Patient oldpatient= patientConverter.toEntity(getPatientById(id));
 
         oldpatient.setFirstName(patientDto.getFirstName());
         oldpatient.setLastName(patientDto.getLastName());
@@ -49,15 +49,15 @@ public class PatientService {
         oldpatient.setPassword(patientDto.getPassword());
         oldpatient.setSSID(patientDto.getSSID());
         oldpatient.setDateOfBirth(patientDto.getDateOfBirth());
-        oldpatient.setRole(converter.patientConvertFromDto(patientDto).getRole());
+        oldpatient.setRole(patientConverter.toEntity(patientDto).getRole());
 
-        return converter.patientConvertToDto(patientRepository.save(oldpatient));
+        return patientConverter.toDto(patientRepository.save(oldpatient));
     }
 
     public PatientDto createPatient(PatientDto patientDto) {
         Patient patient= patientRepository.save
-               (converter.patientConvertFromDto(patientDto));
-       return converter.patientConvertToDto(patient);
+               (patientConverter.toEntity(patientDto));
+       return patientConverter.toDto(patient);
     }
 
     public void deletePatientById(UUID id) {
@@ -69,7 +69,7 @@ public class PatientService {
         if (patient == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid SSID or Password");
         }
-        PatientDto patientDto=converter.patientConvertToDto(patient);
+        PatientDto patientDto= patientConverter.toDto(patient);
 
         if (patientDto.getPassword().equals(loginRequest.getPassword())) {
             return ResponseEntity.ok("Login successful");
@@ -77,5 +77,13 @@ public class PatientService {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid SSID or Password");
         }
 
+    }
+    public PatientDto getPatientBySSID(String ssid) {
+        Patient patient=patientRepository.findPatientBySSID(ssid);
+        if (patient == null) {
+            throw new RuntimeException("Patient not found");
+        }else {
+            return patientConverter.toDto(patient);
+        }
     }
 }

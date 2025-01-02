@@ -7,41 +7,43 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
 
 @RestController
-@RequestMapping("/treatment")
+@RequestMapping("/api/treatments")
 public class TreatmentController {
+
     private final TreatmentService treatmentService;
 
     public TreatmentController(TreatmentService treatmentService) {
         this.treatmentService = treatmentService;
     }
 
+
     @GetMapping
     public ResponseEntity<List<TreatmentDto>> getAllTreatments() {
-        return new ResponseEntity<>
-                (treatmentService.getAllTreatments(), HttpStatus.OK);
+        List<TreatmentDto> treatments = treatmentService.getAllTreatments();
+        return new ResponseEntity<>(treatments, HttpStatus.OK);
     }
-    @GetMapping("/{id}")
-    public ResponseEntity<TreatmentDto> getTreatmentById(@PathVariable UUID id) {
 
-        return new ResponseEntity<>
-                (treatmentService.getTreatmentById(id), HttpStatus.OK);
+
+    @GetMapping("/{id}")
+    public ResponseEntity<TreatmentDto> getTreatmentById(@PathVariable Long id) {
+        TreatmentDto treatment = treatmentService.getTreatmentById(id);
+        return new ResponseEntity<>(treatment, HttpStatus.OK);
     }
+
 
     @PostMapping
-    public ResponseEntity<TreatmentDto>createTreatment(@RequestBody TreatmentDto treatmentDto) {
-        return new ResponseEntity<>
-                (treatmentService.createTreatment(treatmentDto), HttpStatus.CREATED);
+    public ResponseEntity<TreatmentDto> createTreatment(@RequestBody TreatmentDto treatmentDto) {
+        TreatmentDto createdTreatment = treatmentService.createTreatment(treatmentDto);
+        return new ResponseEntity<>(createdTreatment, HttpStatus.CREATED);
     }
-    @PostMapping("/{id}")
-    public ResponseEntity<TreatmentDto>updateTreatment(@PathVariable UUID id, @RequestBody TreatmentDto treatmentDto) {
-        return new ResponseEntity<>
-                (treatmentService.updateTreatment(treatmentDto, id), HttpStatus.OK);
-    }
-    @DeleteMapping("/{id}")
-    public void deleteTreatment(@PathVariable UUID id) {
-        treatmentService.deleteTreatment(id);
+
+
+    @PutMapping("/{id}")
+    public ResponseEntity<TreatmentDto> updateTreatment(@PathVariable Long id, @RequestBody TreatmentDto treatmentDto) {
+        TreatmentDto updatedTreatment = treatmentService.updateTreatment(id, treatmentDto);
+        return new ResponseEntity<>(updatedTreatment, HttpStatus.OK);
     }
 }
+

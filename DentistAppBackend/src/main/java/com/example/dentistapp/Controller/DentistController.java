@@ -1,6 +1,7 @@
 package com.example.dentistapp.Controller;
 
 import com.example.dentistapp.Dto.DentistDto;
+import com.example.dentistapp.Request.LoginRequest;
 import com.example.dentistapp.Service.DentistService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,7 +13,7 @@ import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 
 @RestController
-@RequestMapping("/dentist")
+@RequestMapping("/api/dentists")
 public class DentistController {
 
     private final DentistService dentistService;
@@ -47,5 +48,10 @@ public class DentistController {
     @DeleteMapping("/{id}")
     public void deleteDentist(@PathVariable UUID id){
         dentistService.deleteDentistById(id);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
+        return new ResponseEntity<>(dentistService.login(loginRequest), OK);
     }
 }

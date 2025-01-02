@@ -1,22 +1,39 @@
 package com.example.dentistapp.Dto;
 
 
-import com.example.dentistapp.Enum.AppointmentStatus;
+import com.example.dentistapp.Model.Dentist;
+import com.example.dentistapp.Model.Patient;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Data
 public class AppointmentDto {
 
-    public UUID getId() {
+    private Long id;
+    @FutureOrPresent(message = "Appointment date and time must be in the future or present.")
+    private LocalDateTime appointmentDateTime;
+    @NotNull
+    private Dentist dentist;
+    @NotNull
+    private Patient patient;
+    private boolean isAvailable;
+
+    public boolean isAvailable() {
+        return isAvailable;
+    }
+
+    public void setAvailable(boolean available) {
+        isAvailable = available;
+    }
+
+    public Long getId() {
         return id;
     }
 
-    public void setId(UUID id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -28,40 +45,19 @@ public class AppointmentDto {
         this.appointmentDateTime = appointmentDateTime;
     }
 
-    public UUID getDentistId() {
-        return dentistId;
+    public Dentist getDentist() {
+        return dentist;
     }
 
-    public void setDentistId(UUID dentistId) {
-        this.dentistId = dentistId;
+    public void setDentist(Dentist dentist) {
+        this.dentist = dentist;
     }
 
-    public UUID getPatientId() {
-        return patientId;
+    public Patient getPatient() {
+        return patient;
     }
 
-    public void setPatientId(UUID patientId) {
-        this.patientId = patientId;
+    public void setPatient(Patient patient) {
+        this.patient = patient;
     }
-
-    public AppointmentStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(AppointmentStatus status) {
-        this.status = status;
-    }
-
-    private UUID id;
-
-    @FutureOrPresent(message = "Appointment date and time must be in the future or present.")
-    private LocalDateTime appointmentDateTime;
-
-    @NotNull
-    private UUID dentistId;
-
-    @NotNull
-    private UUID patientId;
-
-    private AppointmentStatus status;
 }
