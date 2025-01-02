@@ -192,10 +192,5 @@ Endpoints include CRUD operations for managing treatments as shown under AdminCo
 ### LoginRequest
 - Example fields: `username`, `password`.
 
----
 
-## Notes
-1. Ensure all UUID and Long IDs are properly validated in requests.
-2. Authentication endpoints may require token-based authorization.
-3. Error handling and response codes (e.g., `400 Bad Request`, `404 Not Found`) should be implemented.
 
