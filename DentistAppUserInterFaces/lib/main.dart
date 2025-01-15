@@ -1,7 +1,26 @@
-import 'package:appointment_project/screens/login_page.dart';
+import 'package:appointment_project/screens/appointment_page.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:appointment_project/screens/login_page.dart';
+import 'package:appointment_project/screens/register_page.dart';
+import 'firebase_options.dart';
+import 'package:appointment_project/screens/onboarding_page.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Firebase'i başlat
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  // Firebase Auth ayarlarını yapılandır
+  await FirebaseAuth.instance.setSettings(
+    appVerificationDisabledForTesting:
+        true, // Test için reCAPTCHA'yı devre dışı bırak
+  );
+
   runApp(const MyApp());
 }
 
@@ -12,7 +31,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Login/Register',
+      title: 'Dentist Appointment',
       theme: ThemeData(
         primarySwatch: Colors.blue,
         inputDecorationTheme: InputDecorationTheme(
@@ -31,16 +50,14 @@ class MyApp extends StatelessWidget {
             borderSide: const BorderSide(color: Colors.blue, width: 2),
           ),
         ),
-        elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ElevatedButton.styleFrom(
-            padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(30),
-            ),
-          ),
-        ),
       ),
-      home: LoginPage(),
+      initialRoute: '/onboarding',
+      routes: {
+        '/onboarding': (context) => const OnboardingPage(),
+        '/login': (context) => LoginPage(),
+        '/register': (context) => RegisterPage(),
+        '/appointment': (context) => const AppointmentPage(userEmail: ''),
+      },
     );
   }
 }

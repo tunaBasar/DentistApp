@@ -1,146 +1,107 @@
-import 'package:appointment_project/screens/admin_login_page.dart';
 import 'package:flutter/material.dart';
-import 'package:appointment_project/screens/appointment_page.dart';
+import 'package:appointment_project/services/auth_service.dart';
 import 'package:appointment_project/screens/register_page.dart';
 
 class LoginPage extends StatelessWidget {
-  final TextEditingController ssidController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
-
   LoginPage({super.key});
+
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  final AuthService _authService = AuthService();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Colors.blue.shade300,
-              Colors.purple.shade300,
-            ],
-          ),
-        ),
-        child: SafeArea(
-          child: Center(
-            child: SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                child: Column(
+      backgroundColor: Colors.grey[300],
+      body: SafeArea(
+        child: Center(
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(
+                  Icons.local_hospital,
+                  size: 100,
+                  color: Colors.blue,
+                ),
+                const SizedBox(height: 30),
+                Text(
+                  'HOŞGELDİNİZ',
+                  style: TextStyle(
+                    color: Colors.grey[700],
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 25),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                  child: _buildTextField(
+                    controller: emailController,
+                    hintText: 'Email',
+                    icon: Icons.email,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                  child: _buildTextField(
+                    controller: passwordController,
+                    hintText: 'Şifre',
+                    isPassword: true,
+                    icon: Icons.lock,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                  child: ElevatedButton(
+                    onPressed: () => _handleLogin(context),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue,
+                      padding: const EdgeInsets.all(20),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: const Center(
+                      child: Text(
+                        'Giriş Yap',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(
-                      Icons.lock_open,
-                      size: 150,
-                      color: Colors.white,
-                    ),
-                    const SizedBox(height: 30),
-                    const Text(
-                      'Welcome Back!',
-                      style: TextStyle(
-                        fontSize: 32,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
                     Text(
-                      'Sign in to continue',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.white.withOpacity(0.8),
-                      ),
+                      'Hesabınız yok mu? ',
+                      style: TextStyle(color: Colors.grey[700]),
                     ),
-                    const SizedBox(height: 50),
-                    // SSID (TC)
-                    _buildTextField(
-                        ssidController, 'SSID (TC)', Icons.account_box),
-                    const SizedBox(height: 20),
-                    // Password
-                    _buildTextField(passwordController, 'Password', Icons.lock,
-                        obscureText: true),
-                    const SizedBox(height: 40),
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          String ssid = ssidController.text.trim();
-                          String password = passwordController.text.trim();
-
-                          if (RegisterPage.userDatabase.containsKey(ssid) &&
-                              RegisterPage.userDatabase[ssid]!['password'] ==
-                                  password) {
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    AppointmentPage(userEmail: ssid),
-                              ),
-                            );
-                          } else {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Invalid SSID or Password'),
-                                backgroundColor: Colors.red,
-                              ),
-                            );
-                          }
-                        },
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 15),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                        ),
-                        child: const Text(
-                          'Login',
-                          style: TextStyle(fontSize: 18),
+                    GestureDetector(
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => RegisterPage(),
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 20),
-                    // Register button
-                    TextButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => RegisterPage()),
-                        );
-                      },
                       child: const Text(
-                        'Don\'t have an account? Register',
+                        'Şimdi Kaydol',
                         style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    // Admin Login button
-                    TextButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => AdminLoginPage()),
-                        );
-                      },
-                      child: const Text(
-                        'Admin Girişi',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
+                          color: Colors.blue,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
                   ],
                 ),
-              ),
+              ],
             ),
           ),
         ),
@@ -148,30 +109,55 @@ class LoginPage extends StatelessWidget {
     );
   }
 
-  Widget _buildTextField(
-      TextEditingController controller, String label, IconData icon,
-      {bool obscureText = false}) {
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String hintText,
+    required IconData icon,
+    bool isPassword = false,
+  }) {
     return Container(
       decoration: BoxDecoration(
+        color: Colors.white,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 10,
-            offset: const Offset(0, 5),
+            color: Colors.grey.withOpacity(0.1),
+            spreadRadius: 1,
+            blurRadius: 3,
+            offset: const Offset(0, 2),
           ),
         ],
       ),
       child: TextField(
         controller: controller,
-        obscureText: obscureText,
+        obscureText: isPassword,
         decoration: InputDecoration(
-          labelText: label,
-          prefixIcon: Icon(icon),
-          filled: true,
-          fillColor: Colors.white,
+          prefixIcon: Icon(icon, color: Colors.grey[600]),
+          border: InputBorder.none,
+          hintText: hintText,
+          hintStyle: TextStyle(color: Colors.grey[500]),
+          contentPadding: const EdgeInsets.all(20),
         ),
       ),
+    );
+  }
+
+  Future<void> _handleLogin(BuildContext context) async {
+    if (emailController.text.trim().isEmpty ||
+        passwordController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Lütfen tüm alanları doldurun'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    await _authService.signin(
+      email: emailController.text.trim(),
+      password: passwordController.text.trim(),
+      context: context,
     );
   }
 }
