@@ -1,9 +1,16 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:appointment_project/services/auth_service.dart';
+import 'package:image_picker/image_picker.dart';
 
-class RegisterPage extends StatelessWidget {
-  RegisterPage({super.key});
+class RegisterPage extends StatefulWidget {
+  const RegisterPage({super.key});
 
+  @override
+  State<RegisterPage> createState() => _RegisterPageState();
+}
+
+class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController firstNameController = TextEditingController();
   final TextEditingController lastNameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
@@ -14,6 +21,34 @@ class RegisterPage extends StatelessWidget {
   final TextEditingController ssidController = TextEditingController();
 
   final AuthService _authService = AuthService();
+  File? _imageFile;
+  bool _isLoading = false;
+
+  Future<void> _pickImage() async {
+    final ImagePicker picker = ImagePicker();
+    try {
+      final XFile? image = await picker.pickImage(
+        source: ImageSource.gallery,
+        maxWidth: 512,
+        maxHeight: 512,
+        imageQuality: 75,
+      );
+      if (image != null) {
+        setState(() {
+          _imageFile = File(image.path);
+        });
+      }
+    } catch (e) {
+      _showMessage('Resim seçilirken hata oluştu: $e');
+    }
+  }
+
+  void _showMessage(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,12 +69,39 @@ class RegisterPage extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(
-                  Icons.local_hospital,
-                  size: 100,
-                  color: Colors.blue,
+                // Profil Fotoğrafı Seçici
+                GestureDetector(
+                  onTap: _pickImage,
+                  child: Stack(
+                    children: [
+                      CircleAvatar(
+                        radius: 50,
+                        backgroundColor: Colors.grey[400],
+                        backgroundImage:
+                            _imageFile != null ? FileImage(_imageFile!) : null,
+                        child: _imageFile == null
+                            ? const Icon(Icons.add_a_photo,
+                                size: 40, color: Colors.white)
+                            : null,
+                      ),
+                      if (_imageFile != null)
+                        Positioned(
+                          bottom: 0,
+                          right: 0,
+                          child: CircleAvatar(
+                            backgroundColor: Colors.blue,
+                            radius: 18,
+                            child: IconButton(
+                              icon: const Icon(Icons.edit,
+                                  size: 18, color: Colors.white),
+                              onPressed: _pickImage,
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
                 ),
-                const SizedBox(height: 30),
+                const SizedBox(height: 20),
                 Text(
                   'KAYIT OL',
                   style: TextStyle(
@@ -94,7 +156,7 @@ class RegisterPage extends StatelessWidget {
                 ),
                 const SizedBox(height: 20),
                 ElevatedButton(
-                  onPressed: () => _handleRegister(context),
+                  onPressed: _isLoading ? null : () => _handleRegister(context),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blue,
                     padding: const EdgeInsets.all(20),
@@ -102,16 +164,16 @@ class RegisterPage extends StatelessWidget {
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  child: const Center(
-                    child: Text(
-                      'Kayıt Ol',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
+                  child: _isLoading
+                      ? const CircularProgressIndicator(color: Colors.white)
+                      : const Text(
+                          'Kayıt Ol',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                 ),
               ],
             ),
@@ -155,18 +217,29 @@ class RegisterPage extends StatelessWidget {
   }
 
   Future<void> _handleRegister(BuildContext context) async {
-    // Form validasyonu
     if (!_validateForm(context)) return;
 
-    await _authService.signup(
-      email: emailController.text.trim(),
-      password: passwordController.text.trim(),
-      firstName: firstNameController.text.trim(),
-      lastName: lastNameController.text.trim(),
-      dateOfBirth: dateOfBirthController.text.trim(),
-      ssid: ssidController.text.trim(),
-      context: context,
-    );
+    setState(() => _isLoading = true);
+
+    try {
+      // Önce kullanıcıyı kaydet ve Firebase Auth UID'sini al
+      await _authService.signup(
+        email: emailController.text.trim(),
+        password: passwordController.text.trim(),
+        firstName: firstNameController.text.trim(),
+        lastName: lastNameController.text.trim(),
+        dateOfBirth: dateOfBirthController.text.trim(),
+        ssid: ssidController.text.trim(),
+        profileImage: _imageFile,
+        context: context,
+      );
+    } catch (e) {
+      _showMessage('Kayıt olurken hata oluştu: $e');
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
   }
 
   bool _validateForm(BuildContext context) {
@@ -177,35 +250,32 @@ class RegisterPage extends StatelessWidget {
         confirmPasswordController.text.trim().isEmpty ||
         dateOfBirthController.text.trim().isEmpty ||
         ssidController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Lütfen tüm alanları doldurun'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      _showMessage('Lütfen tüm alanları doldurun');
       return false;
     }
 
     if (passwordController.text != confirmPasswordController.text) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Şifreler eşleşmiyor'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      _showMessage('Şifreler eşleşmiyor');
       return false;
     }
 
     if (ssidController.text.length != 11) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('TC Kimlik No 11 haneli olmalıdır'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      _showMessage('TC Kimlik No 11 haneli olmalıdır');
       return false;
     }
 
     return true;
+  }
+
+  @override
+  void dispose() {
+    firstNameController.dispose();
+    lastNameController.dispose();
+    emailController.dispose();
+    passwordController.dispose();
+    confirmPasswordController.dispose();
+    dateOfBirthController.dispose();
+    ssidController.dispose();
+    super.dispose();
   }
 }

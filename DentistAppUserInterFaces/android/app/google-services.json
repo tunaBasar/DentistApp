@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "566815215135",
-    "project_id": "dentist-app-9f43a",
-    "storage_bucket": "dentist-app-9f43a.firebasestorage.app"
+    "project_number": "337226006598",
+    "project_id": "dentistapp-bd20c",
+    "storage_bucket": "dentistapp-bd20c.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:566815215135:android:488699a0f1899f89de4f2a",
+        "mobilesdk_app_id": "1:337226006598:android:84606f7f0a2664aeda8a47",
         "android_client_info": {
           "package_name": "com.example.dentist_app"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyBZ6r-zDN7S_HAjMEpFN17OgRp_m9OIMB4"
+          "current_key": "AIzaSyArgwBzCWsfQBBLM2-z1hIOPht4pzfnTtQ"
         }
       ],
       "services": {

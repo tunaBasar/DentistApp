@@ -1,4 +1,5 @@
 import 'package:appointment_project/screens/appointment_page.dart';
+import 'package:appointment_project/screens/profile_page.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -10,16 +11,20 @@ import 'package:appointment_project/screens/onboarding_page.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Firebase'i başlat
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
 
-  // Firebase Auth ayarlarını yapılandır
-  await FirebaseAuth.instance.setSettings(
-    appVerificationDisabledForTesting:
-        true, // Test için reCAPTCHA'yı devre dışı bırak
-  );
+    // Firebase Auth ayarlarını yapılandır
+    await FirebaseAuth.instance.setSettings(
+      appVerificationDisabledForTesting: true,
+    );
+
+    print('Firebase başarıyla başlatıldı'); // Debug için
+  } catch (e) {
+    print('Firebase başlatma hatası: $e'); // Debug için
+  }
 
   runApp(const MyApp());
 }
@@ -55,8 +60,9 @@ class MyApp extends StatelessWidget {
       routes: {
         '/onboarding': (context) => const OnboardingPage(),
         '/login': (context) => LoginPage(),
-        '/register': (context) => RegisterPage(),
+        '/register': (context) => const RegisterPage(),
         '/appointment': (context) => const AppointmentPage(userEmail: ''),
+        '/profile': (context) => const ProfilePage(),
       },
     );
   }

@@ -20,9 +20,9 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyBZ6r-zDN7S_HAjMEpFN17OgRp_m9OIMB4',
-    appId: '1:566815215135:android:488699a0f1899f89de4f2a',
-    messagingSenderId: '566815215135',
-    projectId: 'dentist-app-9f43a',
+    apiKey: 'AIzaSyArgwBzCWsfQBBLM2-z1hIOPht4pzfnTtQ',
+    appId: '1:337226006598:android:84606f7f0a2664aeda8a47',
+    messagingSenderId: '337226006598',
+    projectId: 'dentistapp-bd20c',
   );
 }
