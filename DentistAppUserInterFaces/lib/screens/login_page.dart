@@ -101,6 +101,17 @@ class LoginPage extends StatelessWidget {
                     ),
                   ],
                 ),
+                const SizedBox(height: 20),
+                TextButton(
+                  onPressed: () => _handleAdminLogin(context),
+                  child: const Text(
+                    'Admin Girişi',
+                    style: TextStyle(
+                      color: Colors.red,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
@@ -158,6 +169,52 @@ class LoginPage extends StatelessWidget {
       email: emailController.text.trim(),
       password: passwordController.text.trim(),
       context: context,
+    );
+  }
+
+  Future<void> _handleAdminLogin(BuildContext context) async {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Admin Girişi'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: emailController,
+              decoration: const InputDecoration(labelText: 'Admin Email'),
+            ),
+            TextField(
+              controller: passwordController,
+              obscureText: true,
+              decoration: const InputDecoration(labelText: 'Şifre'),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('İptal'),
+          ),
+          TextButton(
+            onPressed: () async {
+              if (emailController.text.trim() == 'admin@gmail.com' &&
+                  passwordController.text.trim() == 'admin123') {
+                Navigator.pop(context);
+                Navigator.pushReplacementNamed(context, '/admin_panel');
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Geçersiz admin bilgileri'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              }
+            },
+            child: const Text('Giriş'),
+          ),
+        ],
+      ),
     );
   }
 }

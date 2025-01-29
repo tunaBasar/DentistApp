@@ -5,9 +5,7 @@ import 'package:appointment_project/screens/profile_page.dart';
 import 'package:appointment_project/services/auth_service.dart';
 
 class AppointmentPage extends StatefulWidget {
-  final String userEmail;
-
-  const AppointmentPage({super.key, required this.userEmail});
+  const AppointmentPage({super.key});
 
   @override
   State<AppointmentPage> createState() => _AppointmentPageState();
@@ -21,6 +19,13 @@ class _AppointmentPageState extends State<AppointmentPage> {
   String? selectedTimeString;
   String? selectedDoctor;
   String? selectedTreatment;
+  late String _currentUserEmail;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentUserEmail = FirebaseAuth.instance.currentUser?.email ?? '';
+  }
 
   final List<String> treatmentOptions = [
     'Diş Temizliği',
@@ -34,7 +39,7 @@ class _AppointmentPageState extends State<AppointmentPage> {
 
   Stream<QuerySnapshot> get appointmentsStream => _firestore
       .collection('appointments')
-      .where('userEmail', isEqualTo: widget.userEmail)
+      .where('userEmail', isEqualTo: _currentUserEmail)
       .snapshots();
 
   String? statusFilter;
@@ -52,7 +57,7 @@ class _AppointmentPageState extends State<AppointmentPage> {
   Stream<QuerySnapshot> get filteredAppointmentsStream {
     var query = _firestore
         .collection('appointments')
-        .where('userEmail', isEqualTo: widget.userEmail);
+        .where('userEmail', isEqualTo: _currentUserEmail);
 
     if (statusFilter != null && statusFilter != 'Tümü') {
       query = query.where('status', isEqualTo: statusFilter!.toLowerCase());
@@ -115,7 +120,7 @@ class _AppointmentPageState extends State<AppointmentPage> {
                     color: Colors.blue.shade300,
                   ),
                   accountName: Text(userData?['firstName'] ?? ''),
-                  accountEmail: Text(widget.userEmail),
+                  accountEmail: Text(_currentUserEmail),
                   currentAccountPicture: CircleAvatar(
                     backgroundColor: Colors.grey[400],
                     backgroundImage: userData?['profileImageUrl'] != null &&
@@ -488,7 +493,7 @@ class _AppointmentPageState extends State<AppointmentPage> {
       }
 
       await _firestore.collection('appointments').add({
-        'userEmail': widget.userEmail,
+        'userEmail': _currentUserEmail,
         'userId': _auth.currentUser?.uid,
         'doctor': selectedDoctor,
         'date': Timestamp.fromDate(

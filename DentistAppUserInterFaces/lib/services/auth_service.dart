@@ -194,8 +194,7 @@ class AuthService {
       if (context.mounted) {
         Navigator.pushReplacementNamed(
           context,
-          '/appointment',
-          arguments: email,
+          '/appointment', // Email parametresini kaldırıyoruz
         );
       }
     } catch (e) {

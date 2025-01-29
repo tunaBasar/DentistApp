@@ -111,14 +111,12 @@ class _ProfilePageState extends State<ProfilePage> {
       final user = FirebaseAuth.instance.currentUser;
       if (user == null) return;
 
-      // Şifre değişikliği kontrolü
       if (_currentPasswordController.text.isNotEmpty) {
         if (_newPasswordController.text != _confirmPasswordController.text) {
           _showMessage('Yeni şifreler eşleşmiyor');
           return;
         }
 
-        // Mevcut şifreyi doğrula
         final credential = EmailAuthProvider.credential(
           email: user.email!,
           password: _currentPasswordController.text,
@@ -128,10 +126,8 @@ class _ProfilePageState extends State<ProfilePage> {
         await user.updatePassword(_newPasswordController.text);
       }
 
-      // Profil resmini güncelle
       final imageUrl = await _uploadImage();
 
-      // Kullanıcı bilgilerini güncelle
       await FirebaseFirestore.instance
           .collection('users')
           .doc(user.uid)
@@ -147,7 +143,6 @@ class _ProfilePageState extends State<ProfilePage> {
 
       _showMessage('Profil başarıyla güncellendi');
 
-      // Şifre alanlarını temizle
       _currentPasswordController.clear();
       _newPasswordController.clear();
       _confirmPasswordController.clear();
@@ -155,6 +150,61 @@ class _ProfilePageState extends State<ProfilePage> {
       _showMessage('Güncelleme sırasında hata oluştu: $e');
     } finally {
       setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _deleteAccount() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Hesabı Sil'),
+        content: const Text(
+            'Hesabınızı ve tüm verilerinizi kalıcı olarak silmek istediğinize emin misiniz? Bu işlem geri alınamaz!'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('İptal'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Evet, Sil', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true) return;
+
+    setState(() => _isLoading = true);
+
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) return;
+
+      // Firestore verilerini sil
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .delete();
+
+      // Storage'dan resmi sil
+      if (_profileImageUrl != null && _profileImageUrl!.isNotEmpty) {
+        final ref = FirebaseStorage.instance.refFromURL(_profileImageUrl!);
+        await ref.delete();
+      }
+
+      // Auth'dan kullanıcıyı sil
+      await user.delete();
+
+      if (mounted) {
+        Navigator.pushReplacementNamed(context, '/login');
+      }
+    } catch (e) {
+      _showMessage('Hesap silinirken hata oluştu: $e');
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 
@@ -178,7 +228,6 @@ class _ProfilePageState extends State<ProfilePage> {
           key: _formKey,
           child: Column(
             children: [
-              // Profil Fotoğrafı
               GestureDetector(
                 onTap: _pickImage,
                 child: Stack(
@@ -216,8 +265,6 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
               ),
               const SizedBox(height: 24),
-
-              // Ad Soyad
               TextFormField(
                 controller: _firstNameController,
                 decoration: const InputDecoration(
@@ -228,7 +275,6 @@ class _ProfilePageState extends State<ProfilePage> {
                     value?.isEmpty ?? true ? 'Ad boş olamaz' : null,
               ),
               const SizedBox(height: 16),
-
               TextFormField(
                 controller: _lastNameController,
                 decoration: const InputDecoration(
@@ -239,8 +285,6 @@ class _ProfilePageState extends State<ProfilePage> {
                     value?.isEmpty ?? true ? 'Soyad boş olamaz' : null,
               ),
               const SizedBox(height: 16),
-
-              // Salt okunur email alanı
               TextFormField(
                 controller: _emailController,
                 readOnly: true,
@@ -257,8 +301,6 @@ class _ProfilePageState extends State<ProfilePage> {
                 style: const TextStyle(color: Colors.black54),
               ),
               const SizedBox(height: 16),
-
-              // Salt okunur SSID alanı
               TextFormField(
                 controller: _ssidController,
                 readOnly: true,
@@ -275,8 +317,6 @@ class _ProfilePageState extends State<ProfilePage> {
                 style: const TextStyle(color: Colors.black54),
               ),
               const SizedBox(height: 24),
-
-              // Şifre Değiştirme Bölümü
               ExpansionTile(
                 title: const Text('Şifre Değiştir'),
                 children: [
@@ -338,8 +378,6 @@ class _ProfilePageState extends State<ProfilePage> {
                 ],
               ),
               const SizedBox(height: 24),
-
-              // Güncelle Butonu
               ElevatedButton(
                 onPressed: _isLoading ? null : _updateProfile,
                 style: ElevatedButton.styleFrom(
@@ -356,6 +394,22 @@ class _ProfilePageState extends State<ProfilePage> {
                         'Güncelle',
                         style: TextStyle(fontSize: 18),
                       ),
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: _isLoading ? null : _deleteAccount,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                ),
+                child: const Text(
+                  'Hesabımı Sil',
+                  style: TextStyle(fontSize: 18, color: Colors.white),
+                ),
               ),
             ],
           ),

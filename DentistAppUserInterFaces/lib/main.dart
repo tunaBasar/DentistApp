@@ -1,3 +1,4 @@
+import 'package:appointment_project/screens/admin_panel.dart';
 import 'package:appointment_project/screens/appointment_page.dart';
 import 'package:appointment_project/screens/profile_page.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -61,8 +62,9 @@ class MyApp extends StatelessWidget {
         '/onboarding': (context) => const OnboardingPage(),
         '/login': (context) => LoginPage(),
         '/register': (context) => const RegisterPage(),
-        '/appointment': (context) => const AppointmentPage(userEmail: ''),
+        '/appointment': (context) => const AppointmentPage(),
         '/profile': (context) => const ProfilePage(),
+        '/admin_panel': (context) => const AdminPanel(),
       },
     );
   }
